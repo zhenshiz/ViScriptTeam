@@ -2,7 +2,6 @@ package com.viscript_team;
 
 import com.viscript_team.event.FactionEvents;
 import com.viscript_team.client.FactionClientEvents;
-import com.viscript_team.util.FactionSerializers;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
@@ -25,7 +24,6 @@ public class ViScriptTeam {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public ViScriptTeam(IEventBus modEventBus, ModContainer modContainer, Dist dist) {
-        FactionSerializers.register();
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.CONFIG_SPEC, "%s_config.toml".formatted(MOD_ID));
         NeoForge.EVENT_BUS.register(FactionEvents.class);
         if (dist == Dist.CLIENT) {

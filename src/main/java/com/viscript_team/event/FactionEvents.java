@@ -1,10 +1,6 @@
 package com.viscript_team.event;
 
-import com.lowdragmc.lowdraglib2.registry.AutoRegistry;
-import com.lowdragmc.lowdraglib2.registry.annotation.LDLRegister;
-import com.viscript_team.ViScriptTeamRegistries;
 import com.viscript_team.ai.FactionTargetGoal;
-import com.viscript_team.command.ICommand;
 import com.viscript_team.network.FactionNameTagSync;
 import com.viscript_team.util.FactionApi;
 import lombok.experimental.UtilityClass;
@@ -12,7 +8,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
@@ -22,19 +17,11 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.function.Supplier;
 
 @UtilityClass
 public class FactionEvents {
     private static final Set<Mob> FACTION_GOAL_MOBS = Collections.newSetFromMap(new WeakHashMap<>());
     private static final int FACTION_TARGET_GOAL_PRIORITY = 4;
-
-    @SubscribeEvent
-    public static void onRegisterCommands(RegisterCommandsEvent event) {
-        for (AutoRegistry.Holder<LDLRegister, ICommand, Supplier<ICommand>> command : ViScriptTeamRegistries.COMMANDS) {
-            command.value().get().register(event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
-        }
-    }
 
     @SubscribeEvent
     public static void onEntityJoinLevel(EntityJoinLevelEvent event) {

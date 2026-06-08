@@ -33,5 +33,12 @@ versionRange = "[${ldlib2_version},)"
 ordering = "NONE"
 side = "BOTH"
 
+[[dependencies."${mod_id}"]]
+modId = "viscript_lib"
+type = "required"
+versionRange = "[${viscriptlib_version},)"
+ordering = "AFTER"
+side = "BOTH"
+
 [features."${mod_id}"]
 openGLVersion = "[3.2,)"

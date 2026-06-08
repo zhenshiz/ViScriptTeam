@@ -12,6 +12,7 @@ import com.viscript_team.data.faction.FactionAttitude;
 import com.viscript_team.data.party.Party;
 import com.viscript_team.data.party.PartyStandingStrategy;
 import com.viscript_team.util.ViScriptTeamServerUtil;
+import com.viscript_lib.register.ICommand;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
