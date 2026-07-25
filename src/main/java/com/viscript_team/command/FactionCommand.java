@@ -52,12 +52,12 @@ public class FactionCommand implements ICommand {
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
         dispatcher.register(Commands.literal(ViScriptTeam.MOD_ID)
-                .requires(source -> source.hasPermission(2))
                 .then(factionCommands()));
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> factionCommands() {
         return Commands.literal("faction")
+                .requires(source -> source.hasPermission(2))
                 .then(Commands.literal("create")
                         .then(Commands.argument("id", StringArgumentType.word())
                                 .executes(context -> createFaction(context.getSource(), StringArgumentType.getString(context, "id")))))

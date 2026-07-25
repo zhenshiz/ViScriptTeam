@@ -33,6 +33,10 @@ public class Party implements IPersistedSerializable {
     private boolean friendlyFire;
     @Persisted
     private final Set<UUID> members = new HashSet<>();
+    @Persisted
+    private final Set<UUID> invitedPlayers = new HashSet<>();
+    @Persisted
+    private final Set<UUID> joinRequests = new HashSet<>();
 
     public Party(String id, UUID leaderId) {
         this.id = normalizeId(id);
@@ -63,6 +67,14 @@ public class Party implements IPersistedSerializable {
         return Collections.unmodifiableSet(members);
     }
 
+    public Set<UUID> getInvitedPlayers() {
+        return Collections.unmodifiableSet(invitedPlayers);
+    }
+
+    public Set<UUID> getJoinRequests() {
+        return Collections.unmodifiableSet(joinRequests);
+    }
+
     public boolean addMember(UUID playerId) {
         if (!isValidPlayer(playerId)) {
             return false;
@@ -76,6 +88,45 @@ public class Party implements IPersistedSerializable {
 
     public boolean containsMember(UUID playerId) {
         return members.contains(playerId);
+    }
+
+    public boolean isLeader(UUID playerId) {
+        return isValidPlayer(playerId) && playerId.equals(leaderId);
+    }
+
+    public boolean invitePlayer(UUID playerId) {
+        if (!isValidPlayer(playerId) || containsMember(playerId)) {
+            return false;
+        }
+        joinRequests.remove(playerId);
+        return invitedPlayers.add(playerId);
+    }
+
+    public boolean removeInvitation(UUID playerId) {
+        return invitedPlayers.remove(playerId);
+    }
+
+    public boolean isInvited(UUID playerId) {
+        return invitedPlayers.contains(playerId);
+    }
+
+    public boolean addJoinRequest(UUID playerId) {
+        if (!isValidPlayer(playerId) || containsMember(playerId) || isInvited(playerId)) {
+            return false;
+        }
+        return joinRequests.add(playerId);
+    }
+
+    public boolean removeJoinRequest(UUID playerId) {
+        return joinRequests.remove(playerId);
+    }
+
+    public boolean hasJoinRequest(UUID playerId) {
+        return joinRequests.contains(playerId);
+    }
+
+    public boolean clearPlayerInteraction(UUID playerId) {
+        return invitedPlayers.remove(playerId) | joinRequests.remove(playerId);
     }
 
     public boolean allowsFriendlyFire() {
@@ -100,6 +151,8 @@ public class Party implements IPersistedSerializable {
         }
         setName(name);
         members.removeIf(playerId -> !isValidPlayer(playerId));
+        invitedPlayers.removeIf(playerId -> !isValidPlayer(playerId) || members.contains(playerId));
+        joinRequests.removeIf(playerId -> !isValidPlayer(playerId) || members.contains(playerId));
         if (!hasValidLeader()) {
             leaderId = firstMember().orElse(EMPTY_UUID);
         }

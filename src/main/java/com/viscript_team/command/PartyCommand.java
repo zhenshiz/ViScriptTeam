@@ -11,6 +11,7 @@ import com.viscript_team.data.faction.Faction;
 import com.viscript_team.data.faction.FactionAttitude;
 import com.viscript_team.data.party.Party;
 import com.viscript_team.data.party.PartyStandingStrategy;
+import com.viscript_team.network.PartyScreenSync;
 import com.viscript_team.util.ViScriptTeamServerUtil;
 import com.viscript_lib.register.ICommand;
 import net.minecraft.commands.CommandBuildContext;
@@ -56,13 +57,16 @@ public class PartyCommand implements ICommand {
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
         dispatcher.register(Commands.literal(ViScriptTeam.MOD_ID)
-                .requires(source -> source.hasPermission(2))
                 .then(partyCommands()));
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> partyCommands() {
         return Commands.literal("party")
+                .executes(context -> openPartyScreen(context.getSource()))
+                .then(Commands.literal("open")
+                        .executes(context -> openPartyScreen(context.getSource())))
                 .then(Commands.literal("create")
+                        .requires(source -> source.hasPermission(2))
                         .then(Commands.argument("id", StringArgumentType.word())
                                 .then(Commands.argument("leader", EntityArgument.player())
                                         .executes(context -> createParty(
@@ -70,16 +74,20 @@ public class PartyCommand implements ICommand {
                                                 StringArgumentType.getString(context, "id"),
                                                 EntityArgument.getPlayer(context, "leader"))))))
                 .then(Commands.literal("delete")
+                        .requires(source -> source.hasPermission(2))
                         .then(Commands.argument("id", StringArgumentType.word())
                                 .suggests(PartyCommand::suggestParties)
                                 .executes(context -> deleteParty(context.getSource(), StringArgumentType.getString(context, "id")))))
                 .then(Commands.literal("list")
+                        .requires(source -> source.hasPermission(2))
                         .executes(context -> listParties(context.getSource())))
                 .then(Commands.literal("info")
+                        .requires(source -> source.hasPermission(2))
                         .then(Commands.argument("id", StringArgumentType.word())
                                 .suggests(PartyCommand::suggestParties)
                                 .executes(context -> showPartyInfo(context.getSource(), StringArgumentType.getString(context, "id")))))
                 .then(Commands.literal("join")
+                        .requires(source -> source.hasPermission(2))
                         .then(Commands.argument("targets", EntityArgument.players())
                                 .then(Commands.argument("party", StringArgumentType.word())
                                         .suggests(PartyCommand::suggestParties)
@@ -88,11 +96,13 @@ public class PartyCommand implements ICommand {
                                                 EntityArgument.getPlayers(context, "targets"),
                                                 StringArgumentType.getString(context, "party"))))))
                 .then(Commands.literal("leave")
+                        .requires(source -> source.hasPermission(2))
                         .then(Commands.argument("targets", EntityArgument.players())
                                 .executes(context -> leaveParty(
                                         context.getSource(),
                                         EntityArgument.getPlayers(context, "targets")))))
                 .then(Commands.literal("get")
+                        .requires(source -> source.hasPermission(2))
                         .then(Commands.argument("target", EntityArgument.player())
                                 .executes(context -> getPlayerParty(
                                         context.getSource(),
@@ -104,6 +114,7 @@ public class PartyCommand implements ICommand {
 
     private static LiteralArgumentBuilder<CommandSourceStack> leaderCommands() {
         return Commands.literal("leader")
+                .requires(source -> source.hasPermission(2))
                 .then(Commands.literal("set")
                         .then(Commands.argument("party", StringArgumentType.word())
                                 .suggests(PartyCommand::suggestParties)
@@ -116,6 +127,7 @@ public class PartyCommand implements ICommand {
 
     private static LiteralArgumentBuilder<CommandSourceStack> modifyCommands() {
         return Commands.literal("modify")
+                .requires(source -> source.hasPermission(2))
                 .then(Commands.argument("party", StringArgumentType.word())
                         .suggests(PartyCommand::suggestParties)
                         .then(Commands.literal("friendly_fire")
@@ -128,6 +140,7 @@ public class PartyCommand implements ICommand {
 
     private static LiteralArgumentBuilder<CommandSourceStack> standingCommands() {
         return Commands.literal("standing")
+                .requires(source -> source.hasPermission(2))
                 .then(Commands.literal("get")
                         .then(Commands.argument("party", StringArgumentType.word())
                                 .suggests(PartyCommand::suggestParties)
@@ -145,6 +158,11 @@ public class PartyCommand implements ICommand {
                                                         StringArgumentType.getString(context, "party"),
                                                         StringArgumentType.getString(context, "faction"),
                                                         parseStandingStrategy(StringArgumentType.getString(context, "strategy"))))))));
+    }
+
+    private static int openPartyScreen(CommandSourceStack source) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        PartyScreenSync.open(source.getPlayerOrException());
+        return 1;
     }
 
     private static int createParty(CommandSourceStack source, String partyId, ServerPlayer leader) throws com.mojang.brigadier.exceptions.CommandSyntaxException {

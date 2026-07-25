@@ -186,6 +186,7 @@ public class ViScriptTeamServerUtil {
     public static boolean createParty(ServerLevel level, String partyId, ServerPlayer leader) {
         boolean created = getFactionData(level).createParty(partyId, leader.getUUID());
         if (created) {
+            PartyChatService.clear(level.getServer(), Party.normalizeId(partyId));
             FactionNameTagSync.syncAll(level.getServer());
         }
         return created;
@@ -195,6 +196,7 @@ public class ViScriptTeamServerUtil {
     public static boolean deleteParty(ServerLevel level, String partyId) {
         boolean removed = getFactionData(level).removeParty(partyId);
         if (removed) {
+            PartyChatService.clear(level.getServer(), Party.normalizeId(partyId));
             FactionNameTagSync.syncAll(level.getServer());
         }
         return removed;

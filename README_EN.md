@@ -58,6 +58,21 @@ Each party contains:
 
 A player can only belong to one party at a time. Joining a new party automatically leaves the previous one. Parties with no remaining members are automatically removed.
 
+### Party Screen
+
+Every player can open the party screen without operator permission:
+
+```mcfunction
+/viscript_team party
+/viscript_team party open
+```
+
+The left side contains party members and role-sensitive actions, while the right side contains party chat. Players without a party can create one, browse existing parties and submit join requests, or review invitations from other leaders. Party leaders can invite online players, review join requests, configure friendly fire, right-click members to kick them or transfer leadership, and disband the party. Regular members can leave voluntarily.
+
+Invitations and join requests are persisted with the world. Party chat keeps the latest 100 messages for the current server session only and is cleared when the server restarts or the party is disbanded.
+
+The existing `/viscript_team party create`, `delete`, `join`, `leave`, `leader`, `modify`, and `standing` subcommands remain level-2 operator tools for administrators, map makers, and command scripts.
+
 ### Inter-Faction Hostility
 
 Hostility between factions is **unidirectional**. If you want faction A and faction B to be mutually hostile, you must add both directions:

@@ -256,12 +256,17 @@ public class FactionSavedData extends SavedData implements IPersistedSerializabl
     }
 
     public boolean createParty(String partyId, UUID leaderId) {
+        return createParty(partyId, partyId, leaderId);
+    }
+
+    public boolean createParty(String partyId, String name, UUID leaderId) {
         String id = Party.normalizeId(partyId);
         if (!Party.isValidPlayer(leaderId) || getParty(id).isPresent()) {
             return false;
         }
         removePlayerFromParties(leaderId, null);
-        parties.add(new Party(id, leaderId));
+        clearPlayerInteractions(leaderId);
+        parties.add(new Party(id, leaderId).setName(name));
         setDirty();
         return true;
     }
@@ -281,6 +286,7 @@ public class FactionSavedData extends SavedData implements IPersistedSerializabl
             return false;
         }
         removePlayerFromParties(playerId, party.get().getId());
+        clearPlayerInteractions(playerId);
         party.get().addMember(playerId);
         if (!party.get().hasValidLeader()) {
             party.get().setLeaderId(playerId);
@@ -321,6 +327,42 @@ public class FactionSavedData extends SavedData implements IPersistedSerializabl
             return false;
         }
         party.get().setFriendlyFire(friendlyFire);
+        setDirty();
+        return true;
+    }
+
+    public boolean invitePlayer(String partyId, UUID playerId) {
+        Optional<Party> party = getParty(partyId);
+        if (party.isEmpty() || getPlayerParty(playerId).isPresent() || !party.get().invitePlayer(playerId)) {
+            return false;
+        }
+        setDirty();
+        return true;
+    }
+
+    public boolean removePartyInvitation(String partyId, UUID playerId) {
+        Optional<Party> party = getParty(partyId);
+        if (party.isEmpty() || !party.get().removeInvitation(playerId)) {
+            return false;
+        }
+        setDirty();
+        return true;
+    }
+
+    public boolean addPartyJoinRequest(String partyId, UUID playerId) {
+        Optional<Party> party = getParty(partyId);
+        if (party.isEmpty() || getPlayerParty(playerId).isPresent() || !party.get().addJoinRequest(playerId)) {
+            return false;
+        }
+        setDirty();
+        return true;
+    }
+
+    public boolean removePartyJoinRequest(String partyId, UUID playerId) {
+        Optional<Party> party = getParty(partyId);
+        if (party.isEmpty() || !party.get().removeJoinRequest(playerId)) {
+            return false;
+        }
         setDirty();
         return true;
     }
@@ -423,6 +465,10 @@ public class FactionSavedData extends SavedData implements IPersistedSerializabl
             removePlayerFromParty(party, playerId);
         }
         pruneEmptyParties();
+    }
+
+    private void clearPlayerInteractions(UUID playerId) {
+        parties.forEach(party -> party.clearPlayerInteraction(playerId));
     }
 
     private void removePlayerFromParty(Party party, UUID playerId) {
