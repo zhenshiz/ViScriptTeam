@@ -4,8 +4,11 @@ import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacket;
 import com.lowdragmc.lowdraglib2.syncdata.rpc.RPCSender;
 import com.viscript_team.ViScriptTeam;
 import com.viscript_team.data.faction.FactionSavedData;
+import com.viscript_team.network.FactionEditorSync;
 import com.viscript_team.network.PartyScreenSync;
+import com.viscript_team.util.FactionEditorService;
 import com.viscript_team.util.PartyPlayerService;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.UUID;
@@ -26,6 +29,9 @@ public final class C2SPayload {
     public static final String DISBAND_PARTY = PREFIX + "disband_party_c2s";
     public static final String SET_FRIENDLY_FIRE = PREFIX + "set_party_friendly_fire_c2s";
     public static final String SEND_CHAT_MESSAGE = PREFIX + "send_party_chat_message_c2s";
+    public static final String CREATE_FACTION = PREFIX + "create_faction_editor_c2s";
+    public static final String UPDATE_FACTION = PREFIX + "update_faction_editor_c2s";
+    public static final String DELETE_FACTION = PREFIX + "delete_faction_editor_c2s";
 
     private C2SPayload() {
     }
@@ -107,6 +113,21 @@ public final class C2SPayload {
         }
     }
 
+    @RPCPacket(CREATE_FACTION)
+    public static void createFaction(RPCSender sender, String factionId, String name) {
+        handleFactionEditor(sender, player -> FactionEditorService.createFaction(player, factionId, name));
+    }
+
+    @RPCPacket(UPDATE_FACTION)
+    public static void updateFaction(RPCSender sender, String factionId, CompoundTag settings) {
+        handleFactionEditor(sender, player -> FactionEditorService.updateFaction(player, factionId, settings));
+    }
+
+    @RPCPacket(DELETE_FACTION)
+    public static void deleteFaction(RPCSender sender, String factionId) {
+        handleFactionEditor(sender, player -> FactionEditorService.deleteFaction(player, factionId));
+    }
+
     private static void handle(RPCSender sender, Function<ServerPlayer, PartyPlayerService.Result> action) {
         ServerPlayer player = sender.asPlayer();
         if (player == null) {
@@ -123,6 +144,14 @@ public final class C2SPayload {
                 return PartyPlayerService.Result.invalidTarget();
             }
         });
+    }
+
+    private static void handleFactionEditor(RPCSender sender, Function<ServerPlayer, FactionEditorService.Result> action) {
+        ServerPlayer player = sender.asPlayer();
+        if (player == null) {
+            return;
+        }
+        FactionEditorSync.refreshAll(player.server, player, action.apply(player));
     }
 
     @FunctionalInterface

@@ -10,6 +10,7 @@ import com.viscript_team.ViScriptTeam;
 import com.viscript_team.data.faction.Faction;
 import com.viscript_team.data.faction.FactionAttitude;
 import com.viscript_team.data.faction.FactionSavedData;
+import com.viscript_team.network.FactionEditorSync;
 import com.viscript_team.util.ViScriptTeamServerUtil;
 import com.viscript_lib.register.ICommand;
 import net.minecraft.commands.CommandBuildContext;
@@ -58,6 +59,9 @@ public class FactionCommand implements ICommand {
     private static LiteralArgumentBuilder<CommandSourceStack> factionCommands() {
         return Commands.literal("faction")
                 .requires(source -> source.hasPermission(2))
+                .executes(context -> openFactionEditor(context.getSource()))
+                .then(Commands.literal("open")
+                        .executes(context -> openFactionEditor(context.getSource())))
                 .then(Commands.literal("create")
                         .then(Commands.argument("id", StringArgumentType.word())
                                 .executes(context -> createFaction(context.getSource(), StringArgumentType.getString(context, "id")))))
@@ -74,6 +78,11 @@ public class FactionCommand implements ICommand {
                 .then(enemyCommands())
                 .then(entityFactionCommands())
                 .then(standingCommands());
+    }
+
+    private static int openFactionEditor(CommandSourceStack source) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        FactionEditorSync.open(source.getPlayerOrException());
+        return 1;
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> enemyCommands() {
