@@ -4,15 +4,15 @@ import com.viscript_team.ai.FactionTargetGoal;
 import com.viscript_team.network.FactionNameTagSync;
 import com.viscript_team.util.FactionApi;
 import lombok.experimental.UtilityClass;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
-import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.Collections;
 import java.util.Set;
@@ -54,7 +54,7 @@ public class FactionEvents {
     }
 
     @SubscribeEvent
-    public static void onLivingIncomingDamage(LivingIncomingDamageEvent event) {
+    public static void onLivingIncomingDamage(LivingDamageEvent event) {
         // 伤害事件是最终兜底，避免自定义 AI 绕过友伤规则。
         if (!FactionApi.canHurtFromSource(event.getSource(), event.getEntity())) {
             event.setCanceled(true);
@@ -63,17 +63,17 @@ public class FactionEvents {
 
     @SubscribeEvent
     public static void onLivingChangeTarget(LivingChangeTargetEvent event) {
-        if (event.getNewAboutToBeSetTarget() == null) {
+        if (event.getNewTarget() == null) {
             return;
         }
         // 这里主要拦原版/NeoForge 目标切换，自定义 AI 可以直接调用 FactionApi.canTarget。
-        if (!FactionApi.canTarget(event.getEntity(), event.getNewAboutToBeSetTarget())) {
+        if (!FactionApi.canTarget(event.getEntity(), event.getNewTarget())) {
             event.setCanceled(true);
         }
     }
 
     @SubscribeEvent
-    public static void onEntityTickPost(EntityTickEvent.Post event) {
+    public static void onEntityTickPost(LivingEvent.LivingTickEvent event) {
         if (event.getEntity().level().isClientSide() || !(event.getEntity() instanceof Mob mob)) {
             return;
         }

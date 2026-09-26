@@ -1,27 +1,21 @@
 package com.viscript_team.data.faction;
 
-import com.viscript_team.ViScriptTeam;
+import com.lowdragmc.lowdraglib2.Platform;
 import com.lowdragmc.lowdraglib2.syncdata.IPersistedSerializable;
 import com.lowdragmc.lowdraglib2.syncdata.annotation.Persisted;
+import com.viscript_team.ViScriptTeam;
 import com.viscript_team.data.party.Party;
 import com.viscript_team.data.party.PartyStandingStrategy;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class FactionSavedData extends SavedData implements IPersistedSerializable {
     private static final String DATA_NAME = ViScriptTeam.MOD_ID + "_factions";
-    private static final Factory<FactionSavedData> FACTORY = new Factory<>(FactionSavedData::new, FactionSavedData::load);
 
     @Persisted
     private final List<Faction> factions = new ArrayList<>();
@@ -34,20 +28,20 @@ public class FactionSavedData extends SavedData implements IPersistedSerializabl
 
     public static FactionSavedData get(ServerLevel level) {
         // 阵营数据是整个存档共享的，所以统一挂在主世界 SavedData 上。
-        return level.getServer().overworld().getDataStorage().computeIfAbsent(FACTORY, DATA_NAME);
+        return level.getServer().overworld().getDataStorage().computeIfAbsent(FactionSavedData::load, FactionSavedData::new, DATA_NAME);
     }
 
-    public static FactionSavedData load(CompoundTag tag, HolderLookup.Provider provider) {
+    public static FactionSavedData load(CompoundTag tag) {
         FactionSavedData data = new FactionSavedData();
-        data.deserializeNBT(provider, tag);
+        data.deserializeNBT(Platform.getFrozenRegistry(), tag);
         data.sanitize();
         return data;
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag, HolderLookup.Provider provider) {
+    public @NotNull CompoundTag save(CompoundTag tag) {
         // 游戏只负责 SavedData 外壳，具体字段序列化交给 LDLib2。
-        tag.merge(serializeNBT(provider));
+        tag.merge(serializeNBT(Platform.getFrozenRegistry()));
         return tag;
     }
 

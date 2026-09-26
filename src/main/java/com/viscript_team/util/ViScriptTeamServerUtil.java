@@ -17,11 +17,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 
 @KJSBindings(value = "ViScriptTeamUtil", modId = ViScriptTeam.MOD_ID)
 @UtilityClass

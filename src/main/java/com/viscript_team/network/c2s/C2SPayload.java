@@ -4,6 +4,7 @@ import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacket;
 import com.lowdragmc.lowdraglib2.syncdata.rpc.RPCSender;
 import com.viscript_team.ViScriptTeam;
 import com.viscript_team.data.faction.FactionSavedData;
+import com.viscript_team.data.party.Party;
 import com.viscript_team.network.FactionEditorSync;
 import com.viscript_team.network.PartyScreenSync;
 import com.viscript_team.util.FactionEditorService;
@@ -103,7 +104,7 @@ public final class C2SPayload {
             return;
         }
         String partyId = FactionSavedData.get(player.serverLevel()).getPlayerParty(player.getUUID())
-                .map(party -> party.getId())
+                .map(Party::getId)
                 .orElse("");
         PartyPlayerService.Result result = PartyPlayerService.sendChatMessage(player, message);
         if (result.success() && !partyId.isEmpty()) {

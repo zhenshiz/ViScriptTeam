@@ -1,8 +1,8 @@
 package com.viscript_team.data.faction;
 
-import com.viscript_team.Config;
 import com.lowdragmc.lowdraglib2.syncdata.IPersistedSerializable;
 import com.lowdragmc.lowdraglib2.syncdata.annotation.Persisted;
+import com.viscript_team.Config;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

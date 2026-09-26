@@ -1,11 +1,14 @@
 package com.viscript_team.data.party;
 
+import lombok.Getter;
+
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+@Getter
 public enum PartyStandingStrategy {
     MIN("min"),
     AVERAGE("average"),
@@ -16,10 +19,6 @@ public enum PartyStandingStrategy {
 
     PartyStandingStrategy(String id) {
         this.id = id;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public static PartyStandingStrategy defaultStrategy() {

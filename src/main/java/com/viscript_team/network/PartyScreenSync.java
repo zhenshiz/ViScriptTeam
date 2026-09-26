@@ -1,6 +1,7 @@
 package com.viscript_team.network;
 
 import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacketDistributor;
+import com.mojang.authlib.GameProfile;
 import com.viscript_team.data.faction.FactionSavedData;
 import com.viscript_team.data.party.Party;
 import com.viscript_team.network.s2c.S2CPayload;
@@ -179,7 +180,7 @@ public class PartyScreenSync {
             return online.getGameProfile().getName();
         }
         return server.getProfileCache().get(playerId)
-                .map(profile -> profile.getName())
+                .map(GameProfile::getName)
                 .orElseGet(() -> playerId.toString().substring(0, 8));
     }
 }

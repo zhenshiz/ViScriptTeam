@@ -5,16 +5,8 @@ import com.lowdragmc.lowdraglib2.gui.holder.ModularUIScreen;
 import com.lowdragmc.lowdraglib2.gui.ui.ModularUI;
 import com.lowdragmc.lowdraglib2.gui.ui.UI;
 import com.lowdragmc.lowdraglib2.gui.ui.UIElement;
-import com.lowdragmc.lowdraglib2.gui.ui.data.Horizontal;
-import com.lowdragmc.lowdraglib2.gui.ui.data.ScrollDisplay;
-import com.lowdragmc.lowdraglib2.gui.ui.data.ScrollerMode;
-import com.lowdragmc.lowdraglib2.gui.ui.data.TextWrap;
-import com.lowdragmc.lowdraglib2.gui.ui.data.Vertical;
-import com.lowdragmc.lowdraglib2.gui.ui.elements.Button;
-import com.lowdragmc.lowdraglib2.gui.ui.elements.Dialog;
-import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
-import com.lowdragmc.lowdraglib2.gui.ui.elements.ScrollerView;
-import com.lowdragmc.lowdraglib2.gui.ui.elements.TextField;
+import com.lowdragmc.lowdraglib2.gui.ui.data.*;
+import com.lowdragmc.lowdraglib2.gui.ui.elements.*;
 import com.lowdragmc.lowdraglib2.gui.ui.event.UIEventListener;
 import com.lowdragmc.lowdraglib2.gui.ui.style.StylesheetManager;
 import com.lowdragmc.lowdraglib2.math.Size;
@@ -28,14 +20,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 @OnlyIn(Dist.CLIENT)
 public class FactionEditorScreen extends UIElement {
@@ -291,7 +279,7 @@ public class FactionEditorScreen extends UIElement {
     private void showDeleteDialog(FactionEntry faction) {
         Dialog dialog = Dialog.showCheckBox(
                 KEY + "dialog.delete.title",
-                Component.translatable(KEY + "dialog.delete.content", faction.name(), faction.id()),
+                Component.translatable(KEY + "dialog.delete.content", faction.name(), faction.id()).getString(),
                 confirmed -> {
                     if (confirmed) {
                         RPCPacketDistributor.rpcToServer(C2SPayload.DELETE_FACTION, faction.id());
