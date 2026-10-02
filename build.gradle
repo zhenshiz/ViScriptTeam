@@ -24,7 +24,7 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 dependencies {
     //前置模组
     implementation project(":ViScriptLib")
-    jarJar "com.zhenshiz:ViScriptLib-neoforge-${minecraft_version}:${vsl_jij_version}"
+    jarJar project(path: ":ViScriptLib", configuration: "embeddedLibrary")
 }
 
 publishing {
